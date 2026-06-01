@@ -1,0 +1,67 @@
+pipeline {
+    agent any
+
+    environment {
+        ENV = "${env.BRANCH_NAME}"
+        TF_WORKDIR = "environment/${env.BRANCH_NAME.}" 
+    }
+     stages {
+        stage ('checkout'){
+            steps{
+                git branch: "${env.BRANCH_NAME}",url: 'https://github.com/Sethupathi7205/sethu-infra--deploy-pipeline.git'
+            }
+        } 
+          stages ('terraform init'){
+            steps {
+                dir ("${TF.WORKDIR}")
+            }
+        
+        }
+
+        stages ('terraform plan'){
+            steps {
+                dir ("${TF.WORKDIR}")
+                sh 'terraform plan out=tfplan'
+                sh 'terraform show -no-color tfplan >tfplan.text'
+                sh 'cat tfplan .txt'
+
+            }
+        }
+        stages('Approval'){
+          /*  when{
+                experssion {env.BRANCH_NAME == 'production'}
+            }
+            */ 
+            steps {
+                input message : "aprovee the deployment to production ?" ok : 'deploy' 
+            }
+        }
+}
+
+ 
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    
+
+            
+        
+
+    
+
+        
+    
+
+}
